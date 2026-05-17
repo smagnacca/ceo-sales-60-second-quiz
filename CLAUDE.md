@@ -30,9 +30,43 @@ A landing page / outreach site for Scott's CEO Sales 60-Second Quiz. Used as a d
 
 ## Deploy Process
 
-- Push to `main` → Netlify auto-deploys
+**Deploy via Netlify API zip upload every session** (GitHub auto-deploy is NOT active — the Netlify GitHub app has not been authorized for this repo).
+
+### Standard deploy command (run after any code change + git push):
+
+```bash
+NETLIFY_TOKEN=$(cat ~/.claude/tokens/.netlify_token)
+SITE_ID="20e7d9ad-c961-4d75-a120-e342f2ed5a74"
+
+# 1. Zip site files (exclude dev/meta files)
+cd ~/Documents/Claude/Projects/ceo-sales-60-second-quiz
+zip -r /tmp/ceo-quiz-deploy.zip . \
+  --exclude "*.git*" \
+  --exclude "*/node_modules/*" \
+  --exclude ".gitignore" \
+  --exclude "CLAUDE.md" \
+  --exclude "CHANGELOG.md" \
+  --exclude "MEMORY.md"
+
+# 2. Upload and poll until ready
+DEPLOY_ID=$(curl -s -X POST \
+  -H "Authorization: Bearer $NETLIFY_TOKEN" \
+  -H "Content-Type: application/zip" \
+  --data-binary @/tmp/ceo-quiz-deploy.zip \
+  "https://api.netlify.com/api/v1/sites/$SITE_ID/deploys" | python3 -c "import json,sys; print(json.load(sys.stdin).get('id',''))")
+
+until [ "$(curl -s -H "Authorization: Bearer $NETLIFY_TOKEN" \
+  "https://api.netlify.com/api/v1/deploys/$DEPLOY_ID" | python3 -c "import json,sys; print(json.load(sys.stdin).get('state',''))")" = "ready" ]; do
+  sleep 5
+done
+echo "✅ Deployed: https://ceo-sales-60-second-quiz-outreach.netlify.app"
+```
+
+### To enable GitHub auto-deploy (one-time manual step):
+Go to Netlify dashboard → Site Settings → Build & Deploy → Link repository → authorize the `ceo-sales-60-second-quiz` repo. After that, push to `main` will trigger auto-deploys.
+
 - No build step needed (static HTML)
-- Verify deploy: poll Netlify API until `state: ready`
+- Always verify: poll until `state: ready` before reporting done
 
 ## Tokens
 
