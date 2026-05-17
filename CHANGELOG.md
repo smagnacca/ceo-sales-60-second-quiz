@@ -30,3 +30,40 @@ API zip upload (not GitHub auto-deploy). See CLAUDE.md for the deploy command.
 - Enable GitHub auto-deploy (Netlify dashboard → Link repository) to remove manual deploy requirement
 - Review index.html for any desired content or design updates
 - Confirm which images are still needed (some format-*.jpg files may be unused)
+
+---
+
+## 2026-05-17 — UX Animation Enhancements (Session 2)
+
+### What was done
+
+Analyzed the CEO Sales quiz alongside the 60-second AI quiz (`60-second-ai-quiz.netlify.app`) for animation patterns. Planned and implemented 8 targeted UX enhancements that improve engagement, tactile feedback, and conversion without touching branding or existing functionality.
+
+**Enhancements shipped (all in `index.html`, single file):**
+
+1. **Click sound on answer selection** — Web Audio API (820Hz sine wave, 80ms decay). No external library. Fires on every `.opt` click. Skipped if AudioContext unavailable.
+2. **🔊/🔇 Mute toggle** — Small pill button in quiz card top-right corner. State persisted to `localStorage('quizSoundMuted')`. Previews sound when unmuting.
+3. **Answer spring-bounce** — Selected option springs `scale(1 → 1.045 → 0.982 → 1)` over 220ms via `cubic-bezier(0.34,1.56,0.64,1)`. Removed cleanly after animation ends.
+4. **2.5s "Analyzing your responses" suspense screen** — Shown between email submit and score reveal. Features: animated gold progress bar fill, 4 staggered step labels that appear sequentially (200ms/700ms/1300ms/1900ms), pulsing dots. Then fireworks + results as before.
+5. **Progress bar milestone gold glow** — Gold box-shadow burst on `.progress-track` each time the bar crosses 25%, 50%, 75%, 100% (fires once per threshold).
+6. **Scroll-triggered fade-up entrances** — Stat boxes fade+slide up when entering viewport (IntersectionObserver, 15% threshold). Staggered at 0/120/240ms.
+7. **Input field gold glow on focus** — Email gate fields show gold border + `box-shadow: 0 0 0 3px rgba(201,168,76,0.22)` on focus. Reinforces brand gold at key conversion moment.
+8. **Button press feedback** — `.btn-next`, `.btn-back`, `.btn-submit` scale down to 0.96–0.98 on `:active`.
+
+**Accessibility:** All motion-heavy effects (`optBounce`, `milestonePulse`, `fade-on-scroll` transitions, `analyzeBar` animation) wrapped in `@media (prefers-reduced-motion: no-preference)`. Sound also skipped when reduced motion is preferred.
+
+### Verification
+- Playwright automated check: sound toggle ✅, analyzing screen ✅, all 3 stats fade triggered ✅, answer selection ✅, progress advance ✅, zero console errors ✅
+- Live site screenshotted and confirmed: `ceo-sales-60-second-quiz-outreach.netlify.app`
+
+### Deploy method
+API zip upload (standard for this project). Confirmed `state: ready`.
+
+### Commits this session
+- `2e9354b` — docs: update deploy protocol + detailed session 1 changelog
+- `b47d0b1` — feat: UX animation enhancements — sound, bounce, suspense, scroll-fade
+
+### Next steps
+- Enable GitHub auto-deploy (Netlify dashboard → Link repository)
+- Consider adding a subtle entrance animation to the score ring when results appear (scale 0.8→1 on reveal)
+- A/B test whether the suspense screen improves or hurts conversion rate (could add analytics event)
