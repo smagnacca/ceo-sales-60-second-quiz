@@ -435,6 +435,169 @@
   .pill-glow {
     animation: pillGlowAnim 0.9s ease forwards;
   }
+
+  /* ═══════════════════════════════════════════════════════════════
+     UX ENHANCEMENTS — all wrapped in prefers-reduced-motion guard
+     ═══════════════════════════════════════════════════════════════ */
+  @media (prefers-reduced-motion: no-preference) {
+
+    /* ── Answer option spring-bounce on selection ─────────────── */
+    @keyframes optBounce {
+      0%   { transform: scale(1); }
+      35%  { transform: scale(1.045); }
+      68%  { transform: scale(0.982); }
+      100% { transform: scale(1); }
+    }
+    .opt.bounce { animation: optBounce 0.22s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+
+    /* ── Progress bar milestone gold glow ─────────────────────── */
+    @keyframes milestonePulse {
+      0%   { box-shadow: none; }
+      40%  { box-shadow: 0 0 0 4px rgba(201,168,76,.45), 0 0 16px rgba(201,168,76,.6); }
+      100% { box-shadow: none; }
+    }
+    .progress-track.milestone { animation: milestonePulse 0.55s ease-out forwards; border-radius: 2px; }
+
+    /* ── Scroll-triggered fade-up entrances ───────────────────── */
+    .fade-on-scroll {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .fade-on-scroll.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Button active press feedback ─────────────────────────── */
+    .btn-next:active:not(:disabled) { transform: scale(0.96); }
+    .btn-back:active { transform: scale(0.96); }
+    .btn-submit:active:not(:disabled) { transform: scale(0.98); }
+  }
+
+  /* ── Input field gold glow on focus (always, not motion-gated) */
+  .field input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.22);
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+
+  /* ── Sound toggle button ──────────────────────────────────────── */
+  .sound-toggle {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: .72rem;
+    color: var(--text-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: border-color 0.18s, color 0.18s;
+    z-index: 2;
+    font-family: 'Inter', sans-serif;
+  }
+  .sound-toggle:hover { border-color: var(--green-mid); color: var(--green); }
+  .card { position: relative; }
+
+  /* ── Analyzing / suspense screen ─────────────────────────────── */
+  #analyzingScreen {
+    display: none;
+    text-align: center;
+    padding: 64px 48px 72px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    border-top: 3px solid var(--gold);
+  }
+  #analyzingScreen.active { display: block; }
+  .analyzing-icon { font-size: 2.8rem; margin-bottom: 20px; }
+  .analyzing-title {
+    font-family: 'Merriweather', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 8px;
+  }
+  .analyzing-sub {
+    font-size: .88rem;
+    color: var(--text-soft);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+  .analyzing-dots span {
+    display: inline-block;
+    animation: dotBlink 1.2s ease-in-out infinite;
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .analyzing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .analyzing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dotBlink {
+    0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+    40%            { opacity: 1;   transform: scale(1.2); }
+  }
+  .analyzing-bar-wrap {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 auto;
+    max-width: 320px;
+  }
+  .analyzing-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--green), var(--gold));
+    border-radius: 2px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .analyzing-bar-fill.running {
+      animation: analyzeBar 2.5s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .analyzing-bar-fill.running { width: 100%; }
+  }
+  @keyframes analyzeBar {
+    0%   { width: 0%; }
+    60%  { width: 72%; }
+    85%  { width: 88%; }
+    100% { width: 100%; }
+  }
+  .analyzing-steps {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .analyzing-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .8rem;
+    color: var(--text-soft);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .analyzing-step.visible { opacity: 1; }
+  .analyzing-step-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.3s ease;
+  }
+  .analyzing-step.visible .analyzing-step-dot { background: var(--gold); }
 </style>
 </head>
 <body>
@@ -496,17 +659,17 @@
 </div>
 
 <div class="stats" id="statsSection">
-  <div class="stat">
+  <div class="stat fade-on-scroll">
     <div class="stat-n" id="stat0">77%</div>
     <div class="stat-l">of employers expect hands-on AI experience from their teams</div>
     <div class="stat-cite">CarringtonCrisp, See the Future 2026 (1,863 respondents, 40 countries)</div>
   </div>
-  <div class="stat">
+  <div class="stat fade-on-scroll" style="transition-delay:0.12s">
     <div class="stat-n" id="stat1">56%</div>
     <div class="stat-l">wage premium for professionals with demonstrated AI skills</div>
     <div class="stat-cite">PwC, Global AI Jobs Barometer 2025</div>
   </div>
-  <div class="stat">
+  <div class="stat fade-on-scroll" style="transition-delay:0.24s">
     <div class="stat-n" id="stat2">3–5×</div>
     <div class="stat-l">productivity gap between AI-enabled and non-enabled professionals</div>
     <div class="stat-cite">McKinsey &amp; Company / Lightcast Research, 2024</div>
@@ -541,6 +704,22 @@
   <!-- Fireworks canvas — contained within quiz area -->
   <canvas id="fireworksCanvas"></canvas>
 
+  <!-- Analyzing / suspense screen — shown for 2.5s after email submit -->
+  <div id="analyzingScreen">
+    <div class="analyzing-icon">🔍</div>
+    <div class="analyzing-title">Analyzing Your Responses</div>
+    <div class="analyzing-sub">Calculating your organization's AI Risk Score<span class="analyzing-dots"><span>.</span><span>.</span><span>.</span></span></div>
+    <div class="analyzing-bar-wrap">
+      <div class="analyzing-bar-fill" id="analyzeBarFill"></div>
+    </div>
+    <div class="analyzing-steps">
+      <div class="analyzing-step" id="aStep1"><div class="analyzing-step-dot"></div>Evaluating AI adoption stage</div>
+      <div class="analyzing-step" id="aStep2"><div class="analyzing-step-dot"></div>Assessing competitive exposure</div>
+      <div class="analyzing-step" id="aStep3"><div class="analyzing-step-dot"></div>Benchmarking against industry peers</div>
+      <div class="analyzing-step" id="aStep4"><div class="analyzing-step-dot"></div>Generating your personalized insights</div>
+    </div>
+  </div>
+
   <div class="progress-wrap">
     <div class="progress-meta">
       <span>Your Progress</span>
@@ -553,6 +732,7 @@
 
   <!-- Q1 -->
   <div id="q1" class="card">
+    <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle click sounds">🔊 Sound</button>
     <div class="card-body">
       <div class="q-label">Question 1 of 4</div>
       <h2>How would you describe your organization's current use of AI tools?</h2>
@@ -733,20 +913,67 @@ const answers = {};
 let shakeTimer = null;
 let shakeCount = 0;
 
+// ─── SOUND ───────────────────────────────────────────────────────
+let _audioCtx = null;
+function getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
+}
+function playClickTone() {
+  if (localStorage.getItem('quizSoundMuted') === '1') return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 820;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.09);
+  } catch(e) {}
+}
+function toggleSound() {
+  const muted = localStorage.getItem('quizSoundMuted') === '1';
+  localStorage.setItem('quizSoundMuted', muted ? '0' : '1');
+  const btn = document.getElementById('soundToggle');
+  if (btn) btn.textContent = muted ? '🔊 Sound' : '🔇 Muted';
+  if (!muted) playClickTone(); // preview the sound when unmuting
+}
+
 // ─── QUIZ ────────────────────────────────────────────────────────
 function pick(btn) {
   const q = btn.dataset.q;
-  document.querySelectorAll(`.opt[data-q="${q}"]`).forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll(`.opt[data-q="${q}"]`).forEach(b => b.classList.remove('selected', 'bounce'));
   btn.classList.add('selected');
+  // Spring bounce on selection
+  void btn.offsetWidth; // force reflow to restart animation
+  btn.classList.add('bounce');
+  btn.addEventListener('animationend', () => btn.classList.remove('bounce'), { once: true });
+  playClickTone();
   answers[q] = parseInt(btn.dataset.val);
   document.getElementById('next' + q).disabled = false;
   // NO scroll — user stays exactly where they are
 }
 
+const _milestones = new Set();
 function setProgress(step) {
   const pct = Math.round(((step - 1) / 5) * 100);
   document.getElementById('progressFill').style.width = pct + '%';
   document.getElementById('progressPct').textContent = pct + '% Complete';
+  // Gold glow burst when hitting a milestone for the first time
+  const milestoneHit = [25, 50, 75, 100].includes(pct);
+  if (milestoneHit && !_milestones.has(pct)) {
+    _milestones.add(pct);
+    const track = document.querySelector('.progress-track');
+    track.classList.remove('milestone');
+    void track.offsetWidth;
+    track.classList.add('milestone');
+    track.addEventListener('animationend', () => track.classList.remove('milestone'), { once: true });
+  }
 }
 
 // Scroll to quiz area (not page top) when advancing between cards
@@ -886,7 +1113,6 @@ async function submitQuiz() {
   document.getElementById('lockSvg').classList.remove('shake');
   hide('lockedState');
   show('emailCapture'); // keep card visible while thank-you shows
-  // Re-show just the card (already visible), show thank-you state inside
   document.getElementById('thankyouState').classList.remove('hidden');
   setProgress(5);
 
@@ -896,18 +1122,54 @@ async function submitQuiz() {
   void burst.offsetWidth;
   burst.style.animation = '';
 
+  // ── After brief unlock moment, show analyzing screen (2.5s) ───
   setTimeout(() => {
-    launchFireworks();
-    setTimeout(() => {
+    hide('emailCapture');
+    showAnalyzingScreen(() => {
+      launchFireworks();
       buildResults(score, profile, name, first, email, company);
-      hide('emailCapture');
       const resultsEl = document.getElementById('results');
       resultsEl.classList.remove('hidden');
       setTimeout(() => {
         resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
-    }, 2400);
-  }, 400);
+    });
+  }, 800);
+}
+
+// ─── ANALYZING SCREEN ────────────────────────────────────────────
+function showAnalyzingScreen(onComplete) {
+  const screen = document.getElementById('analyzingScreen');
+  const barFill = document.getElementById('analyzeBarFill');
+  const steps   = ['aStep1','aStep2','aStep3','aStep4'];
+  const delays  = [200, 700, 1300, 1900]; // ms into the 2.5s window
+
+  screen.classList.add('active');
+  screen.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // Start the fill bar
+  void barFill.offsetWidth;
+  barFill.classList.add('running');
+
+  // Stagger step reveals
+  steps.forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('visible');
+    }, delays[i]);
+  });
+
+  // After 2.5s, hide and call back
+  setTimeout(() => {
+    screen.classList.remove('active');
+    barFill.classList.remove('running');
+    barFill.style.width = '0%';
+    steps.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('visible');
+    });
+    onComplete();
+  }, 2500);
 }
 
 // ─── RESULTS ─────────────────────────────────────────────────────
@@ -1322,6 +1584,29 @@ function startPillSequence() {
         const btn = document.getElementById('chapterBtn');
         if (btn) btn.style.display = this.checked ? 'inline-block' : 'none';
       });
+    }
+
+    // ── Scroll-triggered fade-up for .fade-on-scroll elements ───
+    const fadeEls = document.querySelectorAll('.fade-on-scroll');
+    if (fadeEls.length && 'IntersectionObserver' in window) {
+      const fadeObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            fadeObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      fadeEls.forEach(el => fadeObserver.observe(el));
+    } else {
+      // Fallback: just show them
+      fadeEls.forEach(el => el.classList.add('visible'));
+    }
+
+    // ── Init sound toggle label from localStorage ────────────────
+    const soundBtn = document.getElementById('soundToggle');
+    if (soundBtn && localStorage.getItem('quizSoundMuted') === '1') {
+      soundBtn.textContent = '🔇 Muted';
     }
   });
 
